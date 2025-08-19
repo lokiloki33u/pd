@@ -108,11 +108,11 @@ run_subfinder() {
 #     fi
 # }
 
-# 3. Active Enumeration with Amass (This includes passive as well)
+# 3. Active Enumeration with Amass (it will take the subdomain from subfinder)
 run_amass_active() {
     print_banner "Step 3: Running Amass for ACTIVE enumeration"
     echo -e "${YELLOW}[!] This may take a long time. Active scans are deep and thorough.${RESET}"
-    amass enum -active -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -silent
+    amass enum -active -nf "$RECON_DIR/subdomains.txt" -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -silent
     
     AMASS_ACTIVE_COUNT=$(wc -l < "$RECON_DIR/amass_active.txt")
     if [ "$AMASS_ACTIVE_COUNT" -gt 0 ]; then
@@ -126,7 +126,7 @@ run_amass_active() {
 combine_results() {
     print_banner "Step 4: Combining and sorting all results"
     # Combine all three files, sort them, and remove duplicates
-    cat "$RECON_DIR/subfinder.txt" "$RECON_DIR/amass_passive.txt" "$RECON_DIR/amass_active.txt" | sort -u > "$RECON_DIR/unique_subdomains.txt"
+    cat "$RECON_DIR/subfinder.txt" "$RECON_DIR/amass_active.txt" | sort -u > "$RECON_DIR/unique_subdomains.txt"
 
     FINAL_COUNT=$(wc -l < "$RECON_DIR/unique_subdomains.txt")
     echo -e "${GREEN}[+] Final combined list created with $FINAL_COUNT unique subdomains: $RECON_DIR/unique_subdomains.txt${RESET}"
