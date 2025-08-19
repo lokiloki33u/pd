@@ -112,7 +112,7 @@ run_subfinder() {
 run_amass_active() {
     print_banner "Step 3: Running Amass for ACTIVE enumeration"
     echo -e "${YELLOW}[!] This may take a long time. Active scans are deep and thorough.${RESET}"
-    amass enum -active -nf "$RECON_DIR/subdomains.txt" -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -silent
+    amass enum -active -nf "$RECON_DIR/subdomains.txt" -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -config "$RECON_DIR/config.yaml" -silent
     
     AMASS_ACTIVE_COUNT=$(wc -l < "$RECON_DIR/amass_active.txt")
     if [ "$AMASS_ACTIVE_COUNT" -gt 0 ]; then

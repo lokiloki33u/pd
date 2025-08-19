@@ -1,0 +1,13 @@
+# config-scoped-active-only.yaml
+mode: active
+
+# Define the scope. Amass will ONLY investigate assets that end with these domains.
+scope:
+  domains:
+    - example.com
+  blacklist:
+    - dev.subdomain1.com
+    - staging.subdomain2.com
+
+# Disable passive data sources to force active-only mode.
+datasources:
