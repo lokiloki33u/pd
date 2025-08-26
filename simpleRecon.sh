@@ -95,20 +95,8 @@ run_subfinder() {
     fi
 }
 
-# # 2. Deep Passive Scan with Amass
-# run_amass_passive() {
-#     print_banner "Step 2: Running Amass for deep passive enumeration"
-#     amass enum -passive -d "$TARGET" -o "$RECON_DIR/amass_passive.txt" -silent
-    
-#     AMASS_PASSIVE_COUNT=$(wc -l < "$RECON_DIR/amass_passive.txt")
-#     if [ "$AMASS_PASSIVE_COUNT" -gt 0 ]; then
-#         echo -e "${GREEN}[+] Amass (Passive) found $AMASS_PASSIVE_COUNT subdomains. Saved to $RECON_DIR/amass_passive.txt${RESET}"
-#     else
-#         echo -e "${YELLOW}[!] Amass (Passive) found no new subdomains.${RESET}"
-#     fi
-# }
 
-# 3. Active Enumeration with Amass (it will take the subdomain from subfinder)
+# 2. Active Enumeration with Amass (it will take the subdomain from subfinder)
 run_amass_active() {
     print_banner "Step 3: Running Amass for ACTIVE enumeration"
     echo -e "${YELLOW}[!] This may take a long time. Active scans are deep and thorough.${RESET}"
@@ -122,7 +110,7 @@ run_amass_active() {
     fi
 }
 
-# 4. Combine, Unify, and Finalize Results
+# 3. Combine, Unify, and Finalize Results
 combine_results() {
     print_banner "Step 4: Combining and sorting all results"
     # Combine all three files, sort them, and remove duplicates
@@ -136,7 +124,7 @@ combine_results() {
 
 
 
-# 5. Live Host Probing with httpx
+# 4. Live Host Probing with httpx
 run_httpx() {
     print_banner "Step 5: Probing for live web servers with httpx"
     cat "$RECON_DIR/subdomains.txt" | httpx -o "$RECON_DIR/live_hosts.txt" -silent -threads 100
@@ -149,7 +137,7 @@ run_httpx() {
     fi
 }
 
-# 6. Vulnerability Scanning with Nuclei
+# 5. Vulnerability Scanning with Nuclei
 run_nuclei() {
     print_banner "Step 6: Running nuclei for vulnerability scanning"
     echo -e "${YELLOW}[*] This may take a while depending on the number of hosts...${RESET}"
@@ -165,6 +153,8 @@ main() {
     echo -e "${YELLOW}[*] Results will be saved in: $RECON_DIR/${RESET}"
 
     run_subfinder
+    run_amass_active
+    combine_results
     run_httpx
     run_nuclei
 
