@@ -56,7 +56,7 @@ mkdir -p "$RECON_DIR"
 # --- Dependency Check ---
 # Check if all required tools are installed before starting.
 print_banner "Checking for required tools..."
-dependencies=("subfinder" "httpx-toolkit" "nuclei" "amass")
+dependencies=("subfinder" "httpx" "nuclei" "amass")
 missing_deps=()
 
 for tool in "${dependencies[@]}"; do
