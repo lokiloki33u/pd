@@ -85,7 +85,7 @@ fi
 # 1. Subdomain Enumeration with subfinder (Quick Passive Scan with subfinder)
 run_subfinder() {
     print_banner "Step 1: Running subfinder for subdomain enumeration"
-    subfinder -d "$TARGET" -o "$RECON_DIR/subdomains.txt" -all -silent
+    subfinder -d "$TARGET" -o "$RECON_DIR/subdomains.txt" -pc provider-config.yaml -all -silent
     SUB_COUNT=$(wc -l < "$RECON_DIR/subdomains.txt")
     if [ "$SUB_COUNT" -gt 0 ]; then
         echo -e "${GREEN}[+] Found $SUB_COUNT subdomains. Saved to $RECON_DIR/subdomains.txt${RESET}"
