@@ -98,7 +98,7 @@ run_subfinder() {
 
 # 2. Active Enumeration with Amass (it will take the subdomain from subfinder)
 run_amass_active() {
-    print_banner "Step 3: Running Amass for ACTIVE enumeration"
+    print_banner "Step 2: Running Amass for ACTIVE enumeration"
     echo -e "${YELLOW}[!] This may take a long time. Active scans are deep and thorough.${RESET}"
     amass enum -active -nf "$RECON_DIR/subdomains.txt" -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -config config.yaml -silent
     
@@ -112,7 +112,7 @@ run_amass_active() {
 
 # 3. Combine, Unify, and Finalize Results
 combine_results() {
-    print_banner "Step 4: Combining and sorting all results"
+    print_banner "Step 3: Combining and sorting all results"
     # Combine all three files, sort them, and remove duplicates
     cat "$RECON_DIR/subfinder.txt" "$RECON_DIR/amass_active.txt" | sort -u > "$RECON_DIR/unique_subdomains.txt"
 
@@ -126,7 +126,7 @@ combine_results() {
 
 # 4. Live Host Probing with httpx
 run_httpx() {
-    print_banner "Step 5: Probing for live web servers with httpx"
+    print_banner "Step 4: Probing for live web servers with httpx"
     cat "$RECON_DIR/subdomains.txt" | httpx -o "$RECON_DIR/live_hosts.txt" -silent -threads 100
     LIVE_COUNT=$(wc -l < "$RECON_DIR/live_hosts.txt")
     if [ "$LIVE_COUNT" -gt 0 ]; then
@@ -139,7 +139,7 @@ run_httpx() {
 
 # 5. Vulnerability Scanning with Nuclei
 run_nuclei() {
-    print_banner "Step 6: Running nuclei for vulnerability scanning"
+    print_banner "Step 5: Running nuclei for vulnerability scanning"
     echo -e "${YELLOW}[*] This may take a while depending on the number of hosts...${RESET}"
     # Using a curated list of templates for speed: common vulnerabilities, misconfigs, and tech detection.
     nuclei -l "$RECON_DIR/live_hosts.txt" -t cves/ -t technologies/ -t vulnerabilities/ -t misconfiguration/ -o "$RECON_DIR/nuclei_findings.txt" -stats
