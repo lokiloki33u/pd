@@ -86,6 +86,7 @@ fi
 run_subfinder() {
     print_banner "Step 1: Running subfinder for subdomain enumeration"
     subfinder -d "$TARGET" -o "$RECON_DIR/subdomains.txt" -pc provider-config.yaml -all -silent
+    sort -u "$RECON_DIR/subdomains.txt" -o "$RECON_DIR/subdomains.txt" 
     SUB_COUNT=$(wc -l < "$RECON_DIR/subdomains.txt")
     if [ "$SUB_COUNT" -gt 0 ]; then
         echo -e "${GREEN}[+] Found $SUB_COUNT subdomains. Saved to $RECON_DIR/subdomains.txt${RESET}"
@@ -96,29 +97,35 @@ run_subfinder() {
 }
 
 
-# 2. Active Enumeration with Amass (it will take the subdomain from subfinder)
-run_amass_active() {
-    print_banner "Step 2: Running Amass for ACTIVE enumeration"
-    echo -e "${YELLOW}[!] This may take a long time. Active scans are deep and thorough.${RESET}"
-    amass enum -active -nf "$RECON_DIR/subdomains.txt" -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -config config.yaml -silent
+# # 2. Active Enumeration with Amass (it will take the subdomain from subfinder)
+# run_amass_active() {
+#     print_banner "Step 2: Running Amass for ACTIVE enumeration"
+#     echo -e "${YELLOW}[!] This may take a long time. Active scans are deep and thorough.${RESET}"
+#     amass enum -active -nf "$RECON_DIR/subdomains.txt" -d "$TARGET" -o "$RECON_DIR/amass_active.txt" -config config.yaml -silent
     
-    AMASS_ACTIVE_COUNT=$(wc -l < "$RECON_DIR/amass_active.txt")
-    if [ "$AMASS_ACTIVE_COUNT" -gt 0 ]; then
-        echo -e "${GREEN}[+] Amass (Active) found $AMASS_ACTIVE_COUNT subdomains. Saved to $RECON_DIR/amass_active.txt${RESET}"
-    else
-        echo -e "${YELLOW}[!] Amass (Active) found no additional subdomains.${RESET}"
-    fi
-}
+#     AMASS_ACTIVE_COUNT=$(wc -l < "$RECON_DIR/amass_active.txt")
+#     if [ "$AMASS_ACTIVE_COUNT" -gt 0 ]; then
+#         echo -e "${GREEN}[+] Amass (Active) found $AMASS_ACTIVE_COUNT subdomains. Saved to $RECON_DIR/amass_active.txt${RESET}"
+#     else
+#         echo -e "${YELLOW}[!] Amass (Active) found no additional subdomains.${RESET}"
+#     fi
+# }
 
-# 3. Combine, Unify, and Finalize Results
-combine_results() {
-    print_banner "Step 3: Combining and sorting all results"
-    # Combine all three files, sort them, and remove duplicates
-    cat "$RECON_DIR/subfinder.txt" "$RECON_DIR/amass_active.txt" | sort -u > "$RECON_DIR/unique_subdomains.txt"
 
-    FINAL_COUNT=$(wc -l < "$RECON_DIR/unique_subdomains.txt")
-    echo -e "${GREEN}[+] Final combined list created with $FINAL_COUNT unique subdomains: $RECON_DIR/unique_subdomains.txt${RESET}"
-}
+#2 Running bruteforce on root domains and identified subdomains
+source ./puredns.sh
+
+
+
+# # 3. Combine, Unify, and Finalize Results
+# combine_results() {
+#     print_banner "Step 3: Combining and sorting all results"
+#     # Combine all three files, sort them, and remove duplicates
+#     cat "$RECON_DIR/subfinder.txt" "$RECON_DIR/amass_active.txt" | sort -u > "$RECON_DIR/unique_subdomains.txt"
+
+#     FINAL_COUNT=$(wc -l < "$RECON_DIR/unique_subdomains.txt")
+#     echo -e "${GREEN}[+] Final combined list created with $FINAL_COUNT unique subdomains: $RECON_DIR/unique_subdomains.txt${RESET}"
+# }
 
 
 
@@ -127,7 +134,7 @@ combine_results() {
 # 4. Live Host Probing with httpx
 run_httpx() {
     print_banner "Step 4: Probing for live web servers with httpx"
-    cat "$RECON_DIR/subdomains.txt" | httpx -o "$RECON_DIR/live_hosts.txt" -silent -threads 100
+    cat "$RECON_DIR/all_subdomains.txt" | httpx -o "$RECON_DIR/live_hosts.txt" -silent -threads 100
     LIVE_COUNT=$(wc -l < "$RECON_DIR/live_hosts.txt")
     if [ "$LIVE_COUNT" -gt 0 ]; then
         echo -e "${GREEN}[+] Found $LIVE_COUNT live hosts. Saved to $RECON_DIR/live_hosts.txt${RESET}"
@@ -153,8 +160,8 @@ main() {
     echo -e "${YELLOW}[*] Results will be saved in: $RECON_DIR/${RESET}"
 
     run_subfinder
-    run_amass_active
-    combine_results
+    # run_amass_active
+    # combine_results
     run_httpx
     run_nuclei
 
