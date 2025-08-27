@@ -113,7 +113,7 @@ run_subfinder() {
 
 
 #2 Running bruteforce on root domains and identified subdomains
-source ./puredns.sh
+./puredns.sh "$TARGET"
 
 
 
